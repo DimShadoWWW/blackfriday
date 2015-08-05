@@ -45,7 +45,7 @@ func (options *Latex) BlockCode(out *bytes.Buffer, text []byte, lang string) {
 	} else {
 		out.WriteString("\n\\begin{lstlisting}[language=")
 		out.WriteString(lang)
-		out.WriteString(",breaklines=true,showspaces=false,basicstyle=\\ttfamily,numbers=left,numberstyle=\\tiny,commentstyle=\color{gray}]\n")
+		out.WriteString(",breaklines=true,showspaces=false,basicstyle=\\ttfamily,numbers=left,numberstyle=\\tiny,commentstyle=\\color{gray}]\n")
 	}
 	out.Write(text)
 	if lang == "" {
