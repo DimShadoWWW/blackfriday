@@ -45,7 +45,7 @@ func (options *Latex) BlockCode(out *bytes.Buffer, text []byte, lang string) {
 	} else {
 		out.WriteString("\n\\begin{lstlisting}[language=")
 		out.WriteString(lang)
-		out.WriteString("]\n")
+		out.WriteString(",breaklines=true,showspaces=false,basicstyle=\\ttfamily,numbers=left,numberstyle=\\tiny,commentstyle=\color{gray}]\n")
 	}
 	out.Write(text)
 	if lang == "" {
@@ -299,9 +299,18 @@ func (options *Latex) NormalText(out *bytes.Buffer, text []byte) {
 
 // header and footer
 func (options *Latex) DocumentHeader(out *bytes.Buffer) {
-	out.WriteString("\\documentclass{article}\n")
+	//out.WriteString("\\documentclass{article}\n")
+	out.WriteString("\\documentclass[a4paper,spanish,12pt]{article}\n")
 	out.WriteString("\n")
 	out.WriteString("\\usepackage{graphicx}\n")
+   out.WriteString("\\usepackage[spanish,activeacute]{babel} %redundancia del spanish\n")
+   out.WriteString("\\usepackage[latin1,utf8]{inputenc}\n")
+   out.WriteString("\\usepackage{times}\n")
+   out.WriteString("\\usepackage[T1]{fontenc}\n")
+   out.WriteString("\\usefont{T1}{arial}{m}{n}\n")
+   out.WriteString("\\usepackage{tabulary}\n")
+   out.WriteString("\\usepackage{graphicx}\n")
+
 	out.WriteString("\\usepackage{listings}\n")
 	out.WriteString("\\usepackage[margin=1in]{geometry}\n")
 	out.WriteString("\\usepackage[utf8]{inputenc}\n")
