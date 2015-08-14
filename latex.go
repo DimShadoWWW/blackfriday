@@ -17,12 +17,14 @@ package blackfriday
 
 import (
 	"bytes"
+	"fmt"
 )
 
 // Latex is a type that implements the Renderer interface for LaTeX output.
 //
 // Do not create this directly, instead use the LatexRenderer function.
 type Latex struct {
+	Includes []string
 }
 
 // LatexRenderer creates and configures a Latex object, which
@@ -30,8 +32,10 @@ type Latex struct {
 //
 // flags is a set of LATEX_* options ORed together (currently no such options
 // are defined).
-func LatexRenderer(flags int) Renderer {
-	return &Latex{}
+func LatexRenderer(flags int, includes []string) Renderer {
+	return &Latex{
+		Includes: includes,
+	}
 }
 
 func (options *Latex) GetFlags() int {
@@ -302,14 +306,25 @@ func (options *Latex) DocumentHeader(out *bytes.Buffer) {
 	//out.WriteString("\\documentclass{article}\n")
 	out.WriteString("\\documentclass[a4paper,spanish,12pt]{article}\n")
 	out.WriteString("\n")
+
 	out.WriteString("\\usepackage{graphicx}\n")
-   out.WriteString("\\usepackage[spanish,activeacute]{babel} %redundancia del spanish\n")
-   out.WriteString("\\usepackage[latin1,utf8]{inputenc}\n")
-   out.WriteString("\\usepackage{times}\n")
-   out.WriteString("\\usepackage[T1]{fontenc}\n")
-   out.WriteString("\\usefont{T1}{arial}{m}{n}\n")
-   out.WriteString("\\usepackage{tabulary}\n")
-   out.WriteString("\\usepackage{graphicx}\n")
+	out.WriteString("\\usepackage[spanish,activeacute]{babel}\n")
+	out.WriteString("\\usepackage[utf8,latin1]{inputenc}\n")
+	out.WriteString("\\usepackage{times}\n")
+	out.WriteString("\\usepackage[T1]{fontenc}\n")
+	out.WriteString("\\usefont{T1}{arial}{m}{n}\n")
+	out.WriteString("\\usepackage{tabulary}\n")
+	out.WriteString("\\usepackage{graphicx}\n")
+	out.WriteString("\\usepackage{xcolor}\n")
+
+	out.WriteString("\\usepackage{graphicx}\n")
+	out.WriteString("\\usepackage[spanish,activeacute]{babel} %redundancia del spanish\n")
+	out.WriteString("\\usepackage[latin1,utf8]{inputenc}\n")
+	out.WriteString("\\usepackage{times}\n")
+	out.WriteString("\\usepackage[T1]{fontenc}\n")
+	out.WriteString("\\usefont{T1}{arial}{m}{n}\n")
+	out.WriteString("\\usepackage{tabulary}\n")
+	out.WriteString("\\usepackage{graphicx}\n")
 
 	out.WriteString("\\usepackage{listings}\n")
 	out.WriteString("\\usepackage[margin=1in]{geometry}\n")
@@ -332,6 +347,11 @@ func (options *Latex) DocumentHeader(out *bytes.Buffer) {
 	out.WriteString("\\newcommand{\\HRule}{\\rule{\\linewidth}{0.5mm}}\n")
 	out.WriteString("\\addtolength{\\parskip}{0.5\\baselineskip}\n")
 	out.WriteString("\\parindent=0pt\n")
+
+	out.WriteString("\n")
+	for _, include := range options.Includes {
+		out.WriteString(fmt.Sprintf("\\input{%s}\n", include))
+	}
 	out.WriteString("\n")
 	out.WriteString("\\begin{document}\n")
 }
