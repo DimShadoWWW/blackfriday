@@ -24,7 +24,8 @@ import (
 //
 // Do not create this directly, instead use the LatexRenderer function.
 type Latex struct {
-	Includes []string
+	preambleIncludes []string
+	bodyIncludes     []string
 }
 
 // LatexRenderer creates and configures a Latex object, which
@@ -32,9 +33,12 @@ type Latex struct {
 //
 // flags is a set of LATEX_* options ORed together (currently no such options
 // are defined).
-func LatexRenderer(flags int, includes []string) Renderer {
+// pi are a list of files to include in preamble (comma separated list)
+// bi are a list of files to include in body, after \begin{document} (comma separated list)
+func LatexRenderer(flags int, pi, bi []string) Renderer {
 	return &Latex{
-		Includes: includes,
+		preambleIncludes: pi,
+		bodyIncludes:     bi,
 	}
 }
 
@@ -47,9 +51,7 @@ func (options *Latex) BlockCode(out *bytes.Buffer, text []byte, lang string) {
 	if lang == "" {
 		out.WriteString("\n\\begin{verbatim}\n")
 	} else {
-		out.WriteString("\n\\begin{lstlisting}[language=")
-		out.WriteString(lang)
-		out.WriteString(",breaklines=true,showspaces=false,basicstyle=\\ttfamily,numbers=left,numberstyle=\\tiny,commentstyle=\\color{gray}]\n")
+		out.WriteString(fmt.Sprintf("\n\\begin{lstlisting}[language=%s]\n", lang))
 	}
 	out.Write(text)
 	if lang == "" {
@@ -315,8 +317,7 @@ func (options *Latex) DocumentHeader(out *bytes.Buffer) {
 	out.WriteString("\\usefont{T1}{arial}{m}{n}\n")
 	out.WriteString("\\usepackage{tabulary}\n")
 	out.WriteString("\\usepackage{graphicx}\n")
-	out.WriteString("\\usepackage{xcolor}\n")
-
+	out.WriteString("\\usepackage[dvipsnames,svgnames]{xcolor}\n")
 	out.WriteString("\\usepackage{graphicx}\n")
 	out.WriteString("\\usepackage[spanish,activeacute]{babel} %redundancia del spanish\n")
 	out.WriteString("\\usepackage[latin1,utf8]{inputenc}\n")
@@ -349,11 +350,18 @@ func (options *Latex) DocumentHeader(out *bytes.Buffer) {
 	out.WriteString("\\parindent=0pt\n")
 
 	out.WriteString("\n")
-	for _, include := range options.Includes {
-		out.WriteString(fmt.Sprintf("\\input{%s}\n", include))
+	if len(options.preambleIncludes) > 0 {
+		for _, include := range options.preambleIncludes {
+			out.WriteString(fmt.Sprintf("\\input{%s}\n", include))
+		}
 	}
 	out.WriteString("\n")
 	out.WriteString("\\begin{document}\n")
+	if len(options.bodyIncludes) > 0 {
+		for _, include := range options.bodyIncludes {
+			out.WriteString(fmt.Sprintf("\\input{%s}\n", include))
+		}
+	}
 }
 
 func (options *Latex) DocumentFooter(out *bytes.Buffer) {
